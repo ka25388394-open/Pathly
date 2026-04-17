@@ -5,8 +5,7 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import BaseSettings, Field
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -15,11 +14,10 @@ TONE_CHARTER_PATH = Path(__file__).resolve().parent / "core" / "TONE_CHARTER.md"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=PROJECT_ROOT / ".env",
-        env_file_encoding="utf-8",
-        extra="ignore",
-    )
+    class Config:
+        env_file = PROJECT_ROOT / ".env"
+        env_file_encoding = "utf-8"
+        extra = "ignore"
 
     # App
     app_env: str = "development"
