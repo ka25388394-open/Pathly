@@ -24,7 +24,7 @@ import re
 from dataclasses import dataclass
 from typing import Iterable
 
-from pydantic import field_validator
+from pydantic import validator
 
 # ---------------------------------------------------------------------------
 # 第三章 — 絕對禁止句型
@@ -177,7 +177,7 @@ def scan_all(text: str) -> list[ToneViolationInfo]:
 # Pydantic validator 工廠
 # ---------------------------------------------------------------------------
 def tone_field(*fields: str):
-    """Pydantic v2 field_validator 工廠：對指定欄位套用禁止句型檢查。
+    """Pydantic v1 validator 工廠：對指定欄位套用禁止句型檢查。
 
     用法：
 
@@ -186,22 +186,24 @@ def tone_field(*fields: str):
             _tone = tone_field("text")
     """
 
-    def _validator(cls, v, info):  # type: ignore[no-untyped-def]
-        return assert_tone(v, info.field_name)
+    def _validator(cls, v, **kwargs):  # type: ignore[no-untyped-def]
+        field_name = kwargs.get('field', {}).name if 'field' in kwargs else ''
+        return assert_tone(v, field_name)
 
-    return field_validator(*fields)(_validator)
+    return validator(*fields, allow_reuse=True)(_validator)
 
 
 def soft_step_field(*fields: str):
-    """Pydantic v2 field_validator 工廠：對指定欄位套用軟化詞檢查。
+    """Pydantic v1 validator 工廠：對指定欄位套用軟化詞檢查。
 
     專用於 small_step / micro_action 這類行動引導欄位。
     """
 
-    def _validator(cls, v, info):  # type: ignore[no-untyped-def]
-        return assert_soft_step(v, info.field_name)
+    def _validator(cls, v, **kwargs):  # type: ignore[no-untyped-def]
+        field_name = kwargs.get('field', {}).name if 'field' in kwargs else ''
+        return assert_soft_step(v, field_name)
 
-    return field_validator(*fields)(_validator)
+    return validator(*fields, allow_reuse=True)(_validator)
 
 
 # ---------------------------------------------------------------------------
