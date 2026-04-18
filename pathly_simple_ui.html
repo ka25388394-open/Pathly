@@ -208,19 +208,35 @@
             responseDiv.innerHTML = '<div class="loading">pathly 正在細心聆聽與整理...</div>';
 
             try {
-                const response = await fetch('http://127.0.0.1:8001/api/v1/process', {
+                const response = await fetch('https://pathly-production-6301.up.railway.app/api/v1/dialogue/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        user_input: message
+                        user_input: message,
+                        user_id: 'web-user',
+                        context: {}
                     })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    responseDiv.innerHTML = '<div class="response">' + data.response + '</div>';
+
+                    // 處理對話回應格式
+                    let responseHtml = '<div class="response">' + data.response;
+
+                    // 如果有建議，顯示建議
+                    if (data.next_suggestions && data.next_suggestions.length > 0) {
+                        responseHtml += '<br><br><strong>建議：</strong><ul>';
+                        data.next_suggestions.forEach(suggestion => {
+                            responseHtml += '<li>' + suggestion + '</li>';
+                        });
+                        responseHtml += '</ul>';
+                    }
+
+                    responseHtml += '</div>';
+                    responseDiv.innerHTML = responseHtml;
 
                     // 清空輸入框
                     input.value = '';
@@ -228,7 +244,7 @@
                     throw new Error('API 回應錯誤: ' + response.status);
                 }
             } catch (error) {
-                responseDiv.innerHTML = '<div class="response error">連接出現問題：' + error.message + '<br><br>請確認後端服務正在運行 (localhost:8001)</div>';
+                responseDiv.innerHTML = '<div class="response error">連接出現問題：' + error.message + '<br><br>請確認後端服務正在運行 (Railway)</div>';
             }
 
             // 重新啟用輸入

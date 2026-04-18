@@ -55,13 +55,27 @@ async def chat(request: DialogueRequest):
             context=request.context
         )
 
+        # 處理可能的字典格式返回
+        if isinstance(result, dict):
+            response_text = result.get('response', '我現在有點忙，但我在這裡陪你。')
+            level_used = result.get('level_used', 'light')
+            format_type = result.get('format_type', 'simple')
+            suggestions = result.get('next_suggestions', [])
+            confidence = result.get('confidence_score', 0.5)
+        else:
+            response_text = result.response
+            level_used = result.level_used
+            format_type = result.format_type
+            suggestions = result.next_suggestions
+            confidence = result.confidence_score
+
         return DialogueResponse(
-            response=result.response,
-            level_used=result.level_used,
-            format_type=result.format_type,
-            allow_progression=result.allow_progression,
-            next_suggestions=result.next_suggestions,
-            confidence_score=result.confidence_score,
+            response=response_text,
+            level_used=level_used,
+            format_type=format_type,
+            allow_progression=True,
+            next_suggestions=suggestions,
+            confidence_score=confidence,
             success=True
         )
 
