@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>測試 pathly API</title>
+    <meta charset="utf-8">
+</head>
+<body>
+    <h1>pathly API 測試</h1>
+    <button onclick="testAPI()">測試 API 連接</button>
+    <div id="result"></div>
+
+    <script>
+    async function testAPI() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = '測試中...';
+
+        try {
+            const response = await fetch('http://127.0.0.1:8001/api/v1/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_input: '測試訊息'
+                })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                resultDiv.innerHTML = '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } else {
+                resultDiv.innerHTML = '錯誤: ' + response.status + ' - ' + await response.text();
+            }
+        } catch (error) {
+            resultDiv.innerHTML = '連接錯誤: ' + error.message;
+        }
+    }
+    </script>
+</body>
+</html>

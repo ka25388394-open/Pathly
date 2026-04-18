@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>pathly - 陪你慢慢整理內心的角落</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin: 0;
+            color: #2d3748;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: #718096;
+            margin: 10px 0;
+            font-size: 1.1rem;
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #userInput {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        #userInput:focus {
+            border-color: #667eea;
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        }
+
+        #sendButton {
+            padding: 15px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+            min-width: 80px;
+        }
+
+        #sendButton:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #sendButton:disabled {
+            background: #a0aec0;
+            cursor: not-allowed;
+        }
+
+        .response {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 20px 0;
+            border-left: 4px solid #667eea;
+            white-space: pre-line;
+            line-height: 1.6;
+            color: #2d3748;
+        }
+
+        .loading {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+            padding: 20px;
+        }
+
+        .error {
+            background: #fed7d7;
+            color: #c53030;
+            border-left-color: #f56565;
+        }
+
+        .suggestions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .suggestion {
+            background: rgba(255,255,255,0.8);
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .suggestion:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+            background: white;
+        }
+
+        .suggestion h3 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+
+        .suggestion p {
+            margin: 0;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>pathly</h1>
+        <p>陪你慢慢整理內心的角落</p>
+    </div>
+
+    <div class="chat-container">
+        <div class="suggestions" id="suggestions">
+            <div class="suggestion" onclick="setSuggestion('今天心情不太好，想找人聊聊')">
+                <h3>💭 想找人聊聊</h3>
+                <p>像朋友一樣陪你慢慢說</p>
+            </div>
+            <div class="suggestion" onclick="setSuggestion('不知道怎麼開始說我今天的感受')">
+                <h3>😊 今天的心情</h3>
+                <p>不知道怎麼開始也沒關係</p>
+            </div>
+            <div class="suggestion" onclick="setSuggestion('有件事情讓我很困擾，想整理一下')">
+                <h3>🤔 有事想理一理</h3>
+                <p>最近讓你有感覺的事</p>
+            </div>
+            <div class="suggestion" onclick="setSuggestion('想試著讓自己往前一點點')">
+                <h3>🌱 想往前一點點</h3>
+                <p>小小的改變也很棒</p>
+            </div>
+        </div>
+
+        <div class="input-group">
+            <input type="text"
+                   id="userInput"
+                   placeholder="想說什麼就慢慢說吧..."
+                   onkeypress="if(event.key==='Enter') sendMessage()">
+            <button id="sendButton" onclick="sendMessage()">說</button>
+        </div>
+
+        <div id="response"></div>
+    </div>
+
+    <script>
+        function setSuggestion(text) {
+            document.getElementById('userInput').value = text;
+            document.getElementById('suggestions').style.display = 'none';
+            document.getElementById('userInput').focus();
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const button = document.getElementById('sendButton');
+            const responseDiv = document.getElementById('response');
+
+            const message = input.value.trim();
+            if (!message) return;
+
+            // 禁用輸入
+            button.disabled = true;
+            button.textContent = '...';
+            input.disabled = true;
+
+            // 顯示載入中
+            responseDiv.innerHTML = '<div class="loading">pathly 正在細心聆聽與整理...</div>';
+
+            try {
+                const response = await fetch('http://127.0.0.1:8001/api/v1/process', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_input: message
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseDiv.innerHTML = '<div class="response">' + data.response + '</div>';
+
+                    // 清空輸入框
+                    input.value = '';
+                } else {
+                    throw new Error('API 回應錯誤: ' + response.status);
+                }
+            } catch (error) {
+                responseDiv.innerHTML = '<div class="response error">連接出現問題：' + error.message + '<br><br>請確認後端服務正在運行 (localhost:8001)</div>';
+            }
+
+            // 重新啟用輸入
+            button.disabled = false;
+            button.textContent = '說';
+            input.disabled = false;
+            input.focus();
+        }
+
+        // 頁面載入時聚焦輸入框
+        window.onload = function() {
+            document.getElementById('userInput').focus();
+        };
+    </script>
+</body>
+</html>

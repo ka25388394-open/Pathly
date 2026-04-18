@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>pathly 詳細除錯</title>
+    <meta charset="utf-8">
+    <style>
+        body { font-family: monospace; padding: 20px; }
+        button { margin: 10px; padding: 10px; font-size: 16px; }
+        .result { border: 1px solid #ccc; padding: 10px; margin: 10px 0; max-height: 300px; overflow-y: auto; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>pathly 除錯工具</h1>
+
+    <button onclick="testHealth()">1. 測試後端健康檢查</button>
+    <button onclick="testAPI()">2. 測試 API 呼叫</button>
+    <button onclick="testCORS()">3. 測試 CORS</button>
+
+    <div id="results"></div>
+
+    <script>
+    function log(message, isError = false) {
+        const div = document.createElement('div');
+        div.className = isError ? 'result error' : 'result success';
+        div.innerHTML = '<strong>' + new Date().toLocaleTimeString() + '</strong><br>' + message;
+        document.getElementById('results').appendChild(div);
+    }
+
+    async function testHealth() {
+        log('測試後端健康檢查...');
+        try {
+            const response = await fetch('http://127.0.0.1:8001/health');
+            const data = await response.json();
+            log('✅ 健康檢查成功: ' + JSON.stringify(data, null, 2));
+        } catch (error) {
+            log('❌ 健康檢查失敗: ' + error.message, true);
+        }
+    }
+
+    async function testAPI() {
+        log('測試 pathly API...');
+        try {
+            const response = await fetch('http://127.0.0.1:8001/api/v1/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    user_input: '測試訊息'
+                })
+            });
+
+            log('Response status: ' + response.status);
+            log('Response headers: ' + JSON.stringify([...response.headers.entries()], null, 2));
+
+            if (response.ok) {
+                const data = await response.json();
+                log('✅ API 成功回應: ' + JSON.stringify(data, null, 2));
+            } else {
+                const errorText = await response.text();
+                log('❌ API 錯誤 (' + response.status + '): ' + errorText, true);
+            }
+        } catch (error) {
+            log('❌ API 呼叫失敗: ' + error.message, true);
+            log('Error details: ' + error.stack, true);
+        }
+    }
+
+    async function testCORS() {
+        log('測試 CORS 設定...');
+        try {
+            const response = await fetch('http://127.0.0.1:8001/health', {
+                method: 'OPTIONS'
+            });
+            log('✅ CORS preflight 成功: ' + response.status);
+            log('CORS headers: ' + JSON.stringify([...response.headers.entries()], null, 2));
+        } catch (error) {
+            log('❌ CORS 測試失敗: ' + error.message, true);
+        }
+    }
+    </script>
+</body>
+</html>
