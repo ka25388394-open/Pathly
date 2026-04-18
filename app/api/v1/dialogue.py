@@ -7,6 +7,8 @@ from pydantic import BaseModel
 
 from app.core.unified_ai_client import UnifiedAIClient
 
+# Initialize dialogue client
+integrated_dialogue_client = UnifiedAIClient()
 
 router = APIRouter(prefix="/dialogue", tags=["dialogue"])
 

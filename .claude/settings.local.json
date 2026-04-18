@@ -45,7 +45,9 @@
       "Bash(git push *)",
       "Bash(git remote *)",
       "Bash(git rm *)",
-      "Bash(git checkout *)"
+      "Bash(git checkout *)",
+      "Bash(python3 -m py_compile app/api/v1/analyze.py)",
+      "Bash(python3 *)"
     ]
   }
 }

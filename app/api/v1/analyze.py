@@ -9,6 +9,10 @@ from app.db.models import StateRecord, STLAnalysis
 from app.db.session import get_db
 from app.schemas.api import AnalyzeRequest, AnalyzeResponse, Scores
 from app.core.unified_ai_client import UnifiedAIClient
+from app.services.stl_stubs import (
+    run_full_stl, compute_stability, compute_readiness,
+    decide_mode, EngineScores
+)
 
 router = APIRouter(tags=["analyze"])
 

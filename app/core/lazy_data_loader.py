@@ -96,9 +96,9 @@ lazy_loader = LazyDataLoader()
 # 便捷函數
 def get_prompt_lazy(prompt_name: str) -> str:
     """便捷函數：按需載入prompt"""
-    return lazy_loader.get_prompt(prompt_name, use_cache=False)
+    return lazy_loader.get_prompt(prompt_name, use_cache=True)
 
 
 def get_tone_charter_lazy() -> str:
     """便捷函數：按需載入語調憲章"""
-    return lazy_loader.get_tone_charter(use_cache=False)
+    return lazy_loader.get_tone_charter(use_cache=True)

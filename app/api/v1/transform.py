@@ -17,6 +17,7 @@ from app.schemas.stl import (
     StructureMappingOutput,
 )
 from app.core.unified_ai_client import UnifiedAIClient
+from app.services.stl_stubs import run_full_tst
 
 router = APIRouter(tags=["transform"])
 
