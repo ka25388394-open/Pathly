@@ -49,7 +49,8 @@
       "Bash(python3 -m py_compile app/api/v1/analyze.py)",
       "Bash(python3 *)",
       "Bash(pkill *)",
-      "Bash(dir *.wav)"
+      "Bash(dir *.wav)",
+      "Bash(tasklist)"
     ]
   }
 }

@@ -7,8 +7,15 @@ from pydantic import BaseModel
 
 from app.core.unified_ai_client import UnifiedAIClient
 
-# Initialize dialogue client
-integrated_dialogue_client = UnifiedAIClient()
+# Lazy initialize dialogue client to avoid startup issues
+integrated_dialogue_client = None
+
+def get_dialogue_client():
+    global integrated_dialogue_client
+    if integrated_dialogue_client is None:
+        from app.core.unified_ai_client import UnifiedAIClient
+        integrated_dialogue_client = UnifiedAIClient()
+    return integrated_dialogue_client
 
 router = APIRouter(prefix="/dialogue", tags=["dialogue"])
 
@@ -43,7 +50,7 @@ async def chat(request: DialogueRequest):
     系統會根據使用者狀態智能選擇最適合的層級。
     """
     try:
-        result = await integrated_dialogue_client.process_input(
+        result = await get_dialogue_client().process_input(
             user_input=request.user_input,
             context=request.context
         )
@@ -78,7 +85,7 @@ async def test_dialogue_system():
     }
 
     try:
-        results = await integrated_dialogue_client.test_all_levels(test_cases)
+        results = await get_dialogue_client().test_all_levels(test_cases)
         return {
             "status": "success",
             "test_results": results,
@@ -103,13 +110,13 @@ async def analyze_input(request: DialogueRequest):
     """
     try:
         # 先進行分析但不生成回應
-        result = await integrated_dialogue_client.process_input(
+        result = await get_dialogue_client().process_input(
             user_input=request.user_input,
             context=request.context
         )
 
         # 獲取調試信息
-        analytics = integrated_dialogue_client.analysis_engine.get_debug_info(result.analysis_result)
+        analytics = get_dialogue_client().analysis_engine.get_debug_info(result.analysis_result)
 
         return {
             "input": request.user_input,

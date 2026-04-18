@@ -5,7 +5,8 @@ from __future__ import annotations
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic import BaseSettings, Field
+from pydantic import Field
+from pydantic_settings import BaseSettings
 
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -14,16 +15,17 @@ TONE_CHARTER_PATH = Path(__file__).resolve().parent / "core" / "TONE_CHARTER.md"
 
 
 class Settings(BaseSettings):
-    class Config:
-        env_file = PROJECT_ROOT / ".env"
-        env_file_encoding = "utf-8"
-        extra = "ignore"
+    model_config = {
+        "env_file": PROJECT_ROOT / ".env",
+        "env_file_encoding": "utf-8",
+        "extra": "ignore"
+    }
 
     # App
     app_env: str = "development"
     app_debug: bool = True
     app_host: str = "0.0.0.0"
-    app_port: int = 8000
+    app_port: int = Field(default=8000, alias="PORT")
 
     # Database
     database_url: str = "sqlite:///./pathly.db"

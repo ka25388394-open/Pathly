@@ -15,7 +15,12 @@ from app.db.session import init_db
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Phase 1：啟動時建表。Phase 2 改用 Alembic migration。
-    init_db()
+    try:
+        init_db()
+    except Exception as e:
+        # 資料庫初始化失敗不應阻止應用啟動
+        # 健康檢查仍可運作，只是資料庫功能會失效
+        print(f"Warning: Database initialization failed: {e}")
     yield
 
 
@@ -28,12 +33,13 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # MVP 階段允許本地 Next.js dev server。Phase 2 上線前需收緊白名單。
+    # MVP 階段允許本地 Next.js dev server 與直接開啟的 HTML 檔案。Phase 2 上線前需收緊白名單。
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
             "http://localhost:3000",
             "http://127.0.0.1:3000",
+            "null",  # 允許直接開啟的 HTML 檔案
         ],
         allow_credentials=True,
         allow_methods=["*"],
@@ -65,7 +71,7 @@ def create_app() -> FastAPI:
 
     @app.get("/health")
     def health() -> dict[str, str]:
-        return {"status": "ok", "env": settings.app_env}
+        return {"status": "ok", "service": "pathly"}
 
     return app
 
