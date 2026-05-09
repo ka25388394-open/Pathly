@@ -33,19 +33,6 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
-    # MVP 階段允許本地 Next.js dev server 與直接開啟的 HTML 檔案。Phase 2 上線前需收緊白名單。
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=[
-            "http://localhost:3000",
-            "http://127.0.0.1:3000",
-            "null",  # 允許直接開啟的 HTML 檔案
-        ],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
-
     # 先註冊輕量端點
     app.include_router(api_router)
 
@@ -68,6 +55,21 @@ def create_app() -> FastAPI:
             _heavy_endpoints_loaded = True
 
         return await call_next(request)
+
+    # CORS 配置：允許本地開發端口（最後加入，優先執行）
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=[
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+            "http://localhost:5500",
+            "http://127.0.0.1:5500",
+            "null",
+        ],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     @app.get("/health")
     def health() -> dict[str, str]:
