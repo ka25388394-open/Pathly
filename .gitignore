@@ -1,4 +1,50 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
 
-# Environment variables with secrets
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment / secrets
 .env
-.env.local
+.env.*
+!.env.example
+
+# Database / local data
+*.db
+*.sqlite
+*.sqlite3
+app/pathly.db
+
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Claude / AI tool local files
+.claude/
+app/prompts/.claude/
+
+# Node / frontend
+node_modules/
+.next/
+frontend/.next/
+frontend/node_modules/
+
+# Temporary test payloads
+test_*.json
+debug_*.json
+fix_*.json
+
+# Python test cache
+.pytest_cache/
+.coverage
+htmlcov/
