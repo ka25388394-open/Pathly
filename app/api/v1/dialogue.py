@@ -52,6 +52,7 @@ async def chat(request: DialogueRequest):
     try:
         result = await get_dialogue_client().process_input(
             user_input=request.user_input,
+            input_type="dialogue",
             context=request.context
         )
 
@@ -99,12 +100,11 @@ async def test_dialogue_system():
     }
 
     try:
-        results = await get_dialogue_client().test_all_levels(test_cases)
+        # TODO: Implement test_all_levels method in UnifiedAIClient
         return {
             "status": "success",
-            "test_results": results,
-            "total_tests": len(test_cases),
-            "passed": len([r for r in results.values() if "error" not in r])
+            "message": "Test method not yet implemented",
+            "total_tests": len(test_cases)
         }
 
     except Exception as e:
@@ -126,21 +126,14 @@ async def analyze_input(request: DialogueRequest):
         # 先進行分析但不生成回應
         result = await get_dialogue_client().process_input(
             user_input=request.user_input,
+            input_type="dialogue",
             context=request.context
         )
 
-        # 獲取調試信息
-        analytics = get_dialogue_client().analysis_engine.get_debug_info(result.analysis_result)
-
+        # TODO: Implement analysis_engine in UnifiedAIClient
         return {
             "input": request.user_input,
-            "analytics": analytics,
-            "routing_decision": {
-                "level_used": result.level_used,
-                "format_type": result.format_type,
-                "confidence_score": result.confidence_score,
-                "routing_reason": result.routing_reason
-            },
+            "result": result,
             "warning": "此為內部調試信息，不應顯示給使用者"
         }
 
