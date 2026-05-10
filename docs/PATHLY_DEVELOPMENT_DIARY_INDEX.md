@@ -1,5 +1,89 @@
 # Pathly 開發日記索引
 
+---
+
+# Pathly 開發日記固定格式規範
+
+未來每日開發紀錄必須使用以下結構：
+
+## YYYY-MM-DD｜今日主題
+
+### 1. 開始狀態
+
+- branch：
+- upstream：
+- ahead：
+- modified：
+- untracked：
+- 今日主線：
+- 今日是否允許 push：
+- 今日是否允許碰 frontend：
+- 今日是否允許碰 app/ 核心邏輯：
+
+### 2. 今日目標
+
+1.
+2.
+3.
+
+### 3. 今日限制 / 憲法提醒
+
+- 不 git add .
+- 不 push，除非明確要求
+- 不碰 frontend，除非明確要求
+- 不碰 app/ 核心邏輯，除非明確要求
+- 不重構，除非明確要求
+- 不擴功能
+- 不自行進入下一個 Phase
+- 每次只做最小更動
+- 先盤點，再執行
+- 不把整理任務變成開發任務
+
+### 4. 今日執行紀錄
+
+#### Step X：動作名稱
+
+- 目的：
+- 處理檔案：
+- 操作類型：
+- 結果：
+- commit hash：
+- 是否越界：
+- 備註：
+
+### 5. 今日完成事項
+
+-
+
+### 6. 今日未完成事項
+
+-
+
+### 7. 風險 / 注意事項
+
+-
+
+### 8. 結束狀態
+
+- branch：
+- upstream：
+- ahead：
+- modified：
+- untracked：
+- 最新 commit：
+- 是否可進下一階段：
+- 是否建議 push：
+
+### 9. 明天第一步
+
+-
+
+### 10. 明天禁止事項
+
+-
+
+---
+
 ## 📋 開發歷程總覽
 
 ### 🏗️ **2026年4月：架構建構期**
@@ -190,9 +274,35 @@
 
 ---
 
-## 2026-05-09 開發紀錄
+## 2026-05-09｜Phase 2D Stay marker 實作與邊界修補
 
-### 今日完成
+### 1. 開始狀態
+
+- branch：未記錄
+- upstream：未記錄  
+- ahead：未記錄
+- modified：未記錄
+- untracked：未記錄
+- 今日主線：功能開發線（Phase 2D Stay marker）
+- 今日是否允許 push：未明確記錄
+- 今日是否允許碰 frontend：否
+- 今日是否允許碰 app/ 核心邏輯：是（僅限 tst_router.py）
+
+### 2. 今日目標
+
+未明確記錄
+
+### 3. 今日限制 / 憲法提醒
+
+- 不進 Phase 3B
+- 不接 response.message
+- 保持 metadata 標記層優先
+
+### 4. 今日執行紀錄
+
+未採用 Step 格式記錄
+
+### 5. 今日完成事項
 
 1. **Phase 2D：Stay marker 前盤點**
    - 定義 Stay marker 產品邊界
@@ -233,7 +343,30 @@
    - response.message 未被 TST marker 影響
    - session_id / turn_count 正常
 
-### 目前 marker 狀態
+### 6. 今日未完成事項
+
+- Organize marker
+- Transform marker  
+- marker_confidence
+- TST response mode 實作
+
+### 7. 風險 / 注意事項
+
+- reset_signal 在複合句中可能為 false，不影響目前安全判斷
+- 技術語境的「不知道」不應判 Stay
+
+### 8. 結束狀態
+
+- branch：未記錄
+- upstream：未記錄
+- ahead：未記錄
+- modified：未記錄
+- untracked：未記錄
+- 最新 commit：未記錄
+- 是否可進下一階段：是（Phase 2E）
+- 是否建議 push：未記錄
+
+#### marker 完成狀態
 
 **已完成：**
 - Risk
@@ -261,11 +394,11 @@
 - 「先不說這個，我不想活了」最終 tst_marker 正確為 Risk
 - reset_signal 在該複合句中為 false，可記錄為後續 reset_detector 優化觀察，不影響目前安全判斷
 
-### 下一步建議
+### 9. 明天第一步
 
-**下一次從：Phase 2E - Organize marker 前盤點**
+**Phase 2E - Organize marker 前盤點**
 
-**注意：**
+### 10. 明天禁止事項
 - 不要直接實作 Organize
 - 先定義 Organize / Stay / Transform 的邊界
 - 不進 Phase 3B
@@ -275,11 +408,212 @@
 
 ---
 
+## 2026-05-10｜開發環境整理與 Git 分流紀錄
+
+### 1. 開始狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：約 14 commits（開始時）
+- modified：frontend（獨立倉庫，不處理）
+- untracked：約 49 個
+- 今日主線：Git / 開發環境整理線
+- 今日是否允許 push：否
+- 今日是否允許碰 frontend：否
+- 今日是否允許碰 app/ 核心邏輯：否
+
+### 2. 今日目標
+
+1. 整理 untracked 檔案到合適目錄
+2. 建立 scripts/ops 和 scripts/dev 結構
+3. 完成測試檔案群第一輪盤點
+
+### 3. 今日限制 / 憲法提醒
+- 不進 Phase 2E
+- 不做 Organize marker
+- 不做 Transform marker
+- 不做 response_mode
+- 不碰 frontend
+- 不修改 app/ 核心邏輯
+- 不 push
+- 不使用 git add .
+- 每次只做最小更動
+
+### 4. 今日執行紀錄
+
+#### Step 1：完成 docs 開發環境整理文件
+
+- 目的：記錄開發環境整理進度
+- 處理檔案：docs/development_environment_cleanup_progress.md
+- 操作類型：commit
+- 結果：成功
+- commit hash：483660f
+- 是否越界：否
+- 備註：文件記錄
+
+#### Step 2-10：[詳細步驟記錄在完成事項中]
+
+### 5. 今日完成事項
+
+1. **完成 docs 開發環境整理文件 commit**
+   - 483660f docs: add development environment cleanup progress report
+
+2. **完成 legacy prototype 歸檔**
+   - faa07d4 chore: archive legacy prototype apps
+
+3. **修復 ai_simple archive 越界事故**
+   - 081eade 為錯誤 archive commit
+   - 4e06a3a 已 revert
+   - 已確認 ai_simple 遺失不影響主線
+   - /health 正常
+   - /api/v1/ai/support 正常
+
+4. **完成 encoding tools 整理**
+   - 89b9083 chore: move encoding check tools to dev tools
+   - tools/dev/check_encoding.py
+   - tools/dev/check_encoding_simple.py
+   - tools/dev/check_utf8.py
+
+5. **完成 Level 2 dev tools 整理**
+   - b5d70ef chore: move level2 dev tools to dev tools
+   - tools/dev/debug_patterns.py
+   - tools/dev/pattern_test.py
+   - tools/dev/level2_table_report.py
+
+6. **完成 state_patterns.py 歸檔**
+   - 21ac169 chore: archive level2 state pattern reference
+   - archive/reference/state_patterns.py
+
+7. **完成 scripts/ops 整理**
+   - 3ce6056 chore: move core ops scripts to ops folder
+   - 163cf16 chore: move ops helper scripts to ops folder
+   - scripts/ops/ 目前包含 8 個運維腳本
+
+8. **完成 scripts/dev 整理**
+   - da90ac7 chore: move dev test command script to dev scripts
+   - scripts/dev/pathly_test.cmd
+
+9. **刪除過時 / 重複 scripts**
+   - pathly_test_clean.cmd
+   - check_port_before_start.bat
+   - start_pathly.sh
+
+10. **完成測試檔案群第一輪盤點**
+    - 7 個明確保留候選
+    - 7 個明確刪除候選
+    - 8 個 REVIEW_NEEDED
+
+### 今日整理結果
+
+- scripts/ops/ 已建立
+- scripts/dev/ 已建立
+- tools/dev/ 已整理
+- archive/reference/ 已建立
+- untracked 從約 49 個降至 23 個
+- main-clean ahead origin/main-clean 20 commits
+- frontend 仍為 modified，但屬於獨立倉庫，今日不處理
+
+### 測試檔案群盤點結果
+
+#### 明確保留候選
+
+- boundary_test.py
+- final_test.py
+- final_acceptance_test.py
+- level2_quality_test.py
+- api_test_fatigue.py
+- test_app_routes.py
+- level_regression_test.py
+
+#### 明確刪除候選
+
+- simple_test.py
+- single_test.py
+- test_fixes.py
+- test_level_fix.py
+- test_fatigue_fix.py
+- test_ai_import.py
+- test_8008.py
+
+#### REVIEW_NEEDED
+
+- quick_boundary_test.py
+- boundary_stability_test.py
+- simple_acceptance_test.py
+- simple_boundary_test.py
+- simple_regression_test.py
+- test_fixed_regex.py
+- test_precise_patterns.py
+- test_key_sentence.py
+
+### 6. 今日未完成事項
+
+- 處理 8 個 REVIEW_NEEDED 測試檔案
+- 決定 cleanup_services.py 和 identify_services.py 的歸屬
+
+### 7. 風險 / 注意事項
+
+- frontend 是獨立倉庫，modified 狀態正常
+- ai_simple 越界事故已 revert，不影響主線
+- /health 和 /api/v1/ai/support 測試正常
+- 建立了每日開發收尾 SOP
+
+### 8. 結束狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：20 commits
+- modified：frontend（獨立倉庫）
+- untracked：23 個
+- 最新 commit：da90ac7 chore: move dev test command script to dev scripts
+- 是否可進下一階段：是（測試檔案整理）
+- 是否建議 push：否
+
+### 9. 明天第一步
+
+2026-05-11 第一件事：
+
+刪除 7 個明確重複 / 過時的 untracked 測試檔：
+
+- simple_test.py
+- single_test.py
+- test_fixes.py
+- test_level_fix.py
+- test_fatigue_fix.py
+- test_ai_import.py
+- test_8008.py
+
+### 10. 明天禁止事項
+- 不碰 frontend
+- 不碰 app/
+- 不進 Phase 2E
+- 不 push
+- 不使用 git add .
+- 不新增功能
+- 不重構
+- 只處理測試檔案整理
+
+### 備註
+
+今日建立「Pathly 每日開發收尾 SOP」：
+
+每日開發完成後需執行：
+1. git status --short
+2. 檢查 modified / untracked
+3. 確認是否有越界修改
+4. 判斷是否可以 commit
+5. 記錄今日完成事項
+6. 定義明天第一步
+
+此 SOP 用於避免 AI 協作開發累積過多臨時檔、debug 檔、重複測試與越界修改。
+
+---
+
 ## 📝 文件版本說明
 
 - **創建日期**：2026-05-05
-- **最後更新**：2026-05-09  
-- **版本**：v1.1
+- **最後更新**：2026-05-10
+- **版本**：v1.2
 - **維護者**：Pathly 開發團隊
 
 **注意**：本索引文件會隨著專案進展持續更新。如發現索引與實際文件不符，請以各專項 changelog 為準。
