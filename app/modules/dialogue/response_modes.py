@@ -233,6 +233,34 @@ class ResponseModeManager:
 
         return full_prompt
 
+    def determine_mode(self, user_input: str, context: Dict[str, Any] = None) -> str:
+        """
+        根據輸入內容判斷適當的回應模式
+
+        A: 情緒很滿，需要承接
+        B: 混亂不清，需要釐清
+        C: 想要整理，需要結構
+        D: 有自省，需要映照
+        """
+        user_input_lower = user_input.lower()
+        context = context or {}
+
+        # 簡單的規則判斷（最小實現）
+        if any(word in user_input_lower for word in ["炸", "煩", "爆", "受不了", "很滿", "快瘋"]):
+            return "A"  # 承接穩定模式
+
+        elif any(word in user_input_lower for word in ["混", "亂", "說不清", "不知道", "搞不懂"]):
+            return "B"  # 釐清整理模式
+
+        elif any(word in user_input_lower for word in ["怎麼排", "處理", "安排", "規劃", "時間不夠"]):
+            return "C"  # 結構梳理模式
+
+        elif any(word in user_input_lower for word in ["發現", "每次", "模式", "總是", "又", "習慣"]):
+            return "D"  # 映照反思模式
+
+        # 預設使用 A 模式（最安全的承接模式）
+        return "A"
+
     def get_mode_name(self, mode: str) -> str:
         """獲取模式名稱（用於調試）"""
         mode_names = {

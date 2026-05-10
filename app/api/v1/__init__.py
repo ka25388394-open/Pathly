@@ -4,6 +4,7 @@ from fastapi import APIRouter
 
 # 🚀 立即載入：輕量、常用的端點
 from app.api.v1 import dialogue, input as input_ep
+from app.api.v1.ai import ai_router
 
 # 📦 懶載入：重型、較少使用的端點
 _heavy_endpoints = [
@@ -16,6 +17,7 @@ api_router = APIRouter(prefix="/api/v1")
 # 立即註冊輕量端點
 api_router.include_router(input_ep.router)
 api_router.include_router(dialogue.router)
+api_router.include_router(ai_router, prefix="/ai")
 
 
 def _load_heavy_endpoint(endpoint_name: str):
