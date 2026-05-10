@@ -85,6 +85,10 @@ class UnifiedAIClient:
 
             return {
                 "response": response_text,
+                "level_used": self._mode_to_level(response_mode),
+                "format_type": self._mode_to_format(response_mode),
+                "next_suggestions": [],  # TODO: 根據模式生成建議
+                "confidence_score": 0.8,
                 "mode": response_mode,
                 "type": "dialogue",
                 "success": True
@@ -156,9 +160,10 @@ class UnifiedAIClient:
     def _generate_mock_dialogue_response(self, user_input: str, mode: str) -> str:
         """生成mock對話回應"""
         mock_responses = {
-            "supportive": f"我聽到了你分享的「{user_input[:20]}...」，這些感受很真實。想再多聊聊嗎？",
-            "exploratory": f"關於「{user_input[:20]}...」，我很好奇背後的想法。可以多說一些嗎？",
-            "reflective": f"聽起來「{user_input[:20]}...」對你來說很重要。讓我們一起慢慢梳理。"
+            "A": f"先不用急著整理，我在。",
+            "B": f"你想先講比較好說的那一件嗎？",
+            "C": f"我們先聊聊最讓你困擾的那件事，一件就好。",
+            "D": f"你已經注意到這個狀態了，其實很不容易。要不要先一起看看這件事？"
         }
         return mock_responses.get(mode, "謝謝你的分享，我在這裡陪你。")
 
@@ -238,3 +243,23 @@ class UnifiedAIClient:
             template = f"{tone_charter}\n\n{template}"
 
         return template
+
+    def _mode_to_level(self, mode: str) -> str:
+        """將回應模式轉換為 level_used 格式"""
+        mode_map = {
+            "A": "supportive",    # 承接穩定 -> 支持性
+            "B": "clarifying",    # 釐清整理 -> 澄清性
+            "C": "structuring",   # 結構梳理 -> 結構性
+            "D": "reflective"     # 映照反思 -> 反思性
+        }
+        return mode_map.get(mode, "light")
+
+    def _mode_to_format(self, mode: str) -> str:
+        """將回應模式轉換為 format_type 格式"""
+        format_map = {
+            "A": "empathetic",    # 承接穩定 -> 同理心回應
+            "B": "guided",        # 釐清整理 -> 引導式回應
+            "C": "structured",    # 結構梳理 -> 結構化回應
+            "D": "reflective"     # 映照反思 -> 反思式回應
+        }
+        return format_map.get(mode, "simple")
