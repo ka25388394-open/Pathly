@@ -30,31 +30,31 @@ def acceptance_test():
         if response.status_code == 200:
             data = response.json()
 
-            print(f"✅ API 調用成功")
-            print(f"✅ Level: {data['data']['level']} (期望: 2)")
-            print(f"✅ State: {data['data']['response'].get('state', 'N/A')} (期望: 疲勞中)")
+            print(f"[PASS] API 調用成功")
+            print(f"[PASS] Level: {data['data']['level']} (期望: 2)")
+            print(f"[PASS] State: {data['data']['response'].get('state', 'N/A')} (期望: 疲勞中)")
 
             message = data['data']['response']['message']
-            print(f"✅ Response Message 已修改")
+            print(f"[PASS] Response Message 已修改")
             print()
 
             # 檢查是否包含期望的承接語句
             if "聽起來" in message and "累" in message:
-                print("✅ 包含承接疲勞感的語句")
+                print("[PASS] 包含承接疲勞感的語句")
             else:
-                print("❌ 未包含承接疲勞感的語句")
+                print("[FAIL] 未包含承接疲勞感的語句")
 
             # 檢查是否移除了舊的問題句型
             if "維持現在的節奏" not in message and "加入新的元素" not in message:
-                print("✅ 已移除舊的「維持節奏vs加入元素」句型")
+                print("[PASS] 已移除舊的「維持節奏vs加入元素」句型")
             else:
-                print("❌ 仍包含舊的句型")
+                print("[FAIL] 仍包含舊的句型")
 
             # 檢查是否包含理想的問句方向
             if "身體累" in message and "心裡" in message:
-                print("✅ 包含理想的身體vs心理分類問句")
+                print("[PASS] 包含理想的身體vs心理分類問句")
             else:
-                print("❌ 未包含身體vs心理分類問句")
+                print("[FAIL] 未包含身體vs心理分類問句")
 
             print()
             print("完整回應訊息:")
@@ -67,18 +67,18 @@ def acceptance_test():
             message_improved = "維持現在的節奏" not in message
 
             if level_correct and state_correct and message_improved:
-                print("🎉 驗收通過！疲勞短句回應已成功修正")
+                print("[SUCCESS] 驗收通過！疲勞短句回應已成功修正")
                 return True
             else:
-                print("❌ 驗收未完全通過，仍需調整")
+                print("[FAIL] 驗收未完全通過，仍需調整")
                 return False
 
         else:
-            print(f"❌ API 錯誤: {response.status_code} - {response.text}")
+            print(f"[FAIL] API 錯誤: {response.status_code} - {response.text}")
             return False
 
     except Exception as e:
-        print(f"❌ 測試失敗: {e}")
+        print(f"[FAIL] 測試失敗: {e}")
         return False
 
 if __name__ == "__main__":
