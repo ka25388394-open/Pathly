@@ -840,11 +840,182 @@
 
 ---
 
+## 2026-05-12｜測試環境標準化與 emoji 輸出修復
+
+### 1. 開始狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：27 commits（從昨日測試驗收後）
+- modified：frontend（獨立倉庫，不處理）
+- untracked：0
+- 今日主線：測試標準化線（不進 Phase 2E）
+- 今日是否允許 push：否
+- 今日是否允許碰 frontend：否
+- 今日是否允許碰 app/ 核心邏輯：否
+
+### 2. 今日目標
+
+1. 歸檔 legacy unit tests with old imports
+2. 確認 unit pytest recheck 通過
+3. 修復 acceptance test emoji / cp950 編碼問題
+4. 修復 API test emoji / cp950 編碼問題
+5. 不修改 app/，不修改 frontend，不進 Phase 2E
+
+### 3. 今日限制 / 憲法提醒
+
+- 不 git add .
+- 不 push，除非明確要求
+- 不碰 frontend，除非明確要求
+- 不碰 app/ 核心邏輯，除非明確要求
+- 不重構，除非明確要求
+- 不擴功能
+- 不自行進入下一個 Phase
+- 不進 Phase 2E
+- 每次只做最小更動
+- 先盤點，再執行
+- 不把整理任務變成開發任務
+
+### 4. 今日執行紀錄
+
+#### Step 1：legacy unit tests 歸檔
+
+- 目的：將無法正常執行的舊測試移除，避免影響 pytest collection
+- 處理檔案：tests/unit/ 中有 ModuleNotFoundError 的測試檔案
+- 操作類型：archive + commit
+- 結果：成功歸檔，pytest collection 正常
+- commit hash：da9012b test: archive legacy unit tests with old imports
+- 是否越界：否
+- 備註：確保新的 tests/unit 目錄只包含可正常執行的測試
+
+#### Step 2：unit pytest recheck
+
+- 目的：驗證 pytest tests/unit -q 可正常執行
+- 處理檔案：tests/unit/
+- 操作類型：verification
+- 結果：2 passed，無 ModuleNotFoundError
+- commit hash：無（驗證步驟）
+- 是否越界：否
+- 備註：確認 pytest 環境乾淨
+
+#### Step 3：acceptance emoji 修復
+
+- 目的：修復 final_acceptance_test.py 中的 UnicodeEncodeError / cp950 問題
+- 處理檔案：tests/acceptance/final_acceptance_test.py
+- 操作類型：emoji → ASCII 替換 + commit
+- 結果：✅ → [PASS]，❌ → [FAIL]，測試完整通過
+- commit hash：3bc8dbc test: replace emoji output in acceptance test
+- 是否越界：否
+- 備註：只修改輸出格式，未修改測試邏輯
+
+#### Step 4：API test emoji 修復
+
+- 目的：修復 level2_quality_test.py / level_regression_test.py 的 emoji 輸出問題
+- 處理檔案：tests/integration/level2_quality_test.py, tests/regression/level_regression_test.py
+- 操作類型：emoji → ASCII 替換 + commit
+- 結果：✅ → [PASS]，❌ → [FAIL]，✓ → [PASS]，✗ → [FAIL]
+- commit hash：da1b2f4 test: replace emoji output in API test scripts
+- 是否越界：否
+- 備註：只修改顯示文字，未修改測試邏輯、endpoint、request body、response parsing
+
+### 5. 今日完成事項
+
+1. **legacy unit tests 歸檔完成**
+   - 移除了有 import 問題的舊測試檔案
+   - pytest tests/unit -q 可正常執行
+   - 無 ModuleNotFoundError
+
+2. **acceptance test 完整通過**
+   - final_acceptance_test.py emoji 輸出已改為 ASCII
+   - 完整執行通過，無 UnicodeEncodeError
+   - 測試邏輯未修改
+
+3. **API test emoji 修復完成**
+   - level2_quality_test.py / level_regression_test.py 輸出改為 ASCII
+   - 兩個測試檔都可正常執行
+   - 未修改測試邏輯、endpoint、request body、response parsing
+
+4. **app/ 未修改**
+   - 確認未動 app/ 核心邏輯
+
+5. **frontend 未處理**
+   - frontend 仍為 modified 但未包含在今日 commit
+
+6. **git status 維持乾淨**
+   - 只剩 frontend modified
+
+7. **未進 Phase 2E**
+   - 確認未進入功能開發階段
+
+### 6. 今日未完成事項
+
+1. boundary_stability_test.py 中「最近真的很想死」測試期望值需人工確認，可能應屬 Risk / Level 3
+2. 「沒有動力」Level 1 / Level 2 邊界需後續確認
+3. level2_quality_test.py 品質評估結果需後續整理
+4. push 前仍需另做 push 前檢查
+5. Phase 2E Organize marker（今日不處理）
+
+### 7. 風險 / 注意事項
+
+- Windows cp950 編碼問題已透過 emoji → ASCII 解決
+- frontend 是獨立倉庫，modified 狀態正常
+- main-clean 已累積多個 commits，push 前需檢查
+- boundary_stability_test.py 存在期待值需人工確認的測試案例
+
+### 8. 結束狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：約 30 commits
+- modified：frontend（獨立倉庫）
+- untracked：0
+- 最新 commit：da1b2f4 test: replace emoji output in API test scripts
+- 是否可進下一階段：是（可考慮 push 前檢查或繼續 Phase 2E）
+- 是否建議 push：需另做 push 前檢查
+
+### 測試環境標準化完成狀態
+
+**已標準化：**
+- unit tests: pytest 可正常執行
+- acceptance tests: 完整通過，無編碼問題
+- API tests: 可正常執行，ASCII 輸出
+
+**仍待處理：**
+- integration tests 中期待值確認
+- regression tests 邊界案例確認
+- 完整測試套件驗收
+
+### 9. 明天第一步
+
+建議下一步：
+
+**選項 A：推送前檢查**
+- git log 檢查 commits 品質
+- 完整 API 驗收測試
+- frontend 狀態確認
+
+**選項 B：Phase 2E Organize marker**
+- 先做 Organize / Stay / Transform 邊界定義
+- 保持 metadata 層標記
+- 不接 response.message
+
+### 10. 明天禁止事項
+
+- 不碰 frontend
+- 不 git add .
+- 如進 Phase 2E：不直接實作 Organize，先定義邊界
+- 如進 Phase 2E：不進 Phase 3B，不接 response.message
+- 不擴功能
+- 不重構
+- 推送前必須檢查
+
+---
+
 ## 📝 文件版本說明
 
 - **創建日期**：2026-05-05
-- **最後更新**：2026-05-11
-- **版本**：v1.3
+- **最後更新**：2026-05-12
+- **版本**：v1.4
 - **維護者**：Pathly 開發團隊
 
 **注意**：本索引文件會隨著專案進展持續更新。如發現索引與實際文件不符，請以各專項 changelog 為準。
