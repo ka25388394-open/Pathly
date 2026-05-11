@@ -786,6 +786,60 @@
 
 ---
 
+## 2026-05-11 下半段｜測試驗收紀錄
+
+### 測試主線
+
+今日下半段只做 Test only，不修復，不修改正式檔案。
+
+### 已完成測試
+
+1. **API health check**
+   - /health 正常：`{"status":"ok","service":"pathly"}`
+   - /api/v1/ai/support 正常：success:true, level:2, metadata 正常
+   - 後端 8007 成功啟動與測試
+
+2. **Unit tests 初步驗收**
+   - pytest tests/unit 無法完整執行（ModuleNotFoundError / 舊測試 import 問題）
+   - final_test.py 通過：Final Accuracy 10/10 (100.0%)
+   - test_fixed_regex.py 通過：Regex pattern 測試完成
+   - test_precise_patterns.py 部分通過：Overall Pattern Accuracy 92.9%
+   - test_app_routes.py 因 Python path / app import 問題失敗
+
+3. **Acceptance test 初步驗收**
+   - final_acceptance_test.py 因 UnicodeEncodeError 中斷
+   - 原因：Windows cp950 console 無法輸出 emoji 字元（✅/❌）
+   - 測試邏輯尚未完整驗證
+
+### 發現問題
+
+1. **測試套件尚未完全 pytest 標準化**：存在 import / module path 問題
+2. **部分舊測試存在相依性問題**：無法在當前環境正常執行
+3. **Windows console 編碼限制**：影響含 emoji 的測試輸出
+4. **中文輸出編碼問題**：PowerShell 中可能顯示亂碼
+5. **acceptance test 尚未完整驗收通過**：需要編碼環境調整
+
+### 今日不處理事項
+
+- 不修 pytest import 問題
+- 不修 emoji / cp950 編碼問題  
+- 不修改 tests/
+- 不修改 app/
+- 不進 Phase 2E
+- 不跑 integration / regression tests
+
+### 下一步建議
+
+下次第一步應為：**測試環境標準化盤點**，不直接修復。
+
+優先檢查：
+1. tests/ 是否需要統一 pytest 執行方式
+2. 是否需要移除 emoji 輸出或改為 ASCII  
+3. test_app_routes.py 的 import path 問題
+4. acceptance test 是否可在 UTF-8 console 或設定 PYTHONIOENCODING=utf-8 後重跑
+
+---
+
 ## 📝 文件版本說明
 
 - **創建日期**：2026-05-05
