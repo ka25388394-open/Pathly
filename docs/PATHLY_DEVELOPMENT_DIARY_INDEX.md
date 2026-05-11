@@ -617,11 +617,180 @@
 
 ---
 
+## 2026-05-11｜測試檔案整理與 untracked 清零
+
+### 1. 開始狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：20 commits（從昨日結束狀態）
+- modified：frontend（獨立倉庫，不處理）
+- untracked：24+ 個測試相關檔案
+- 今日主線：測試整理線
+- 今日是否允許 push：否
+- 今日是否允許碰 frontend：否
+- 今日是否允許碰 app/ 核心邏輯：否
+
+### 2. 今日目標
+
+1. 刪除明確重複 / 過時的測試檔
+2. 建立乾淨的 tests/ 目錄結構
+3. 將根目錄 untracked 清理至 0
+4. 不進 Phase 2E，不碰 app/，不碰 frontend
+
+### 3. 今日限制 / 憲法提醒
+
+- 不 git add .
+- 不 push
+- 不碰 frontend
+- 不碰 app/ 核心邏輯
+- 不進 Phase 2E
+- 不新增功能
+- 不重構
+- 不把測試整理變成測試重構
+- 每次只做最小更動
+- 先盤點，再執行
+
+### 4. 今日執行紀錄
+
+#### Step 1：刪除 7 個明確重複 / 過時測試檔
+
+- 目的：先清掉明確無保留價值的測試檔
+- 處理檔案：simple_test.py, single_test.py, test_fixes.py, test_level_fix.py, test_fatigue_fix.py, test_ai_import.py, test_8008.py
+- 操作類型：delete
+- 結果：刪除完成
+- commit hash：無，皆為 untracked
+- 是否越界：否
+
+#### Step 2：整理 service ops tools
+
+- 目的：將服務清理與服務識別工具歸入 scripts/ops/
+- 處理檔案：cleanup_services.py → scripts/ops/, identify_services.py → scripts/ops/
+- 操作類型：move + commit
+- 結果：完成
+- commit hash：e3e59d4 chore: move service ops tools to ops folder
+- 是否越界：否
+
+#### Step 3：整理穩定 unit / acceptance tests
+
+- 目的：先收編不需修改內容、無 port 問題的測試檔
+- 處理檔案：final_test.py → tests/unit/, test_app_routes.py → tests/unit/, final_acceptance_test.py → tests/acceptance/
+- 操作類型：move + commit
+- 結果：完成
+- commit hash：118169b test: move stable unit and acceptance tests
+- 是否越界：否
+
+#### Step 4：修正並整理 API port 測試
+
+- 目的：將高價值 API 測試中的過時 port 修正為 8007，並歸入 tests/
+- 處理檔案：boundary_test.py → tests/integration/, level2_quality_test.py → tests/integration/, level_regression_test.py → tests/regression/
+- 操作類型：code change + move + commit
+- 結果：只修正 8008 → 8007，未改 endpoint / request / response 解析
+- commit hash：9523e93 test: update API test ports and organize integration tests
+- 是否越界：否
+
+#### Step 5：刪除 5 個重複 REVIEW_NEEDED 測試檔
+
+- 目的：刪除已被更完整測試覆蓋的重複測試
+- 處理檔案：api_test_fatigue.py, quick_boundary_test.py, simple_acceptance_test.py, simple_boundary_test.py, simple_regression_test.py
+- 操作類型：delete
+- 結果：刪除完成
+- commit hash：無，皆為 untracked
+- 是否越界：否
+
+#### Step 6：整理 regex unit tests
+
+- 目的：保留有獨特價值的 regex / pattern 測試
+- 處理檔案：test_fixed_regex.py → tests/unit/, test_precise_patterns.py → tests/unit/
+- 操作類型：move + commit
+- 結果：完成
+- commit hash：05d2943 test: move regex pattern tests to unit tests
+- 是否越界：否
+
+#### Step 7：整理 boundary stability integration test
+
+- 目的：保留含 25 個案例的邊界穩定性測試，補足 Level 1 分類穩定性檢查
+- 處理檔案：boundary_stability_test.py → tests/integration/
+- 操作類型：code change + move + commit
+- 結果：只修正 8009 → 8007
+- commit hash：57f847e test: add boundary stability integration test
+- 是否越界：否
+
+#### Step 8：刪除最後一個 untracked 測試檔
+
+- 目的：清理不值得單獨維護的關鍵句測試檔
+- 處理檔案：test_key_sentence.py
+- 操作類型：delete
+- 結果：刪除完成；其案例「我今天真的有點累」未來如有需要，可合併進 final_acceptance_test.py
+- commit hash：無，untracked 刪除
+- 是否越界：否
+
+### 5. 今日完成事項
+
+- 完成測試檔案整理
+- 根目錄 untracked 清理至 0
+- 建立 tests/ 正式結構：tests/unit/, tests/integration/, tests/acceptance/, tests/regression/
+- tests/ 目前共 9 個高品質測試檔
+- service ops tools 已歸入 scripts/ops/
+- 未修改 app/
+- 未處理 frontend/
+- 未進 Phase 2E
+
+### 6. 今日未完成事項
+
+- frontend 仍為 modified，屬於獨立倉庫，今日不處理
+- 尚未 push
+- 尚未進入 Phase 2E
+- 尚未執行完整測試驗收
+
+### 7. 風險 / 注意事項
+
+- frontend 是獨立倉庫，不可混入主專案 commit
+- 目前 main-clean 已累積 27 個 ahead commits，push 前需另做 push 前檢查
+- tests/ 已整理，但尚未完整跑過所有測試
+- 不應直接進 Phase 2E，需先做工作區狀態確認與測試驗收
+
+### 8. 結束狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：27 commits
+- modified：frontend（獨立倉庫）
+- untracked：0
+- 最新 commit：57f847e test: add boundary stability integration test
+- 是否可進下一階段：是（測試驗收）
+- 是否建議 push：否
+
+### 9. 明天第一步
+
+建議明天第一步：
+
+只做測試驗收，不進功能開發。
+
+先確認：
+1. /health 正常
+2. /api/v1/ai/support 正常
+3. tests/ 中主要測試是否可執行
+4. git status 是否仍乾淨
+
+### 10. 明天禁止事項
+
+- 不碰 frontend
+- 不碰 app/
+- 不進 Phase 2E
+- 不 push
+- 不 git add .
+- 不新增功能
+- 不重構
+- 不直接修改 tests/，除非測試驗收發現明確問題
+
+---
+
 ## 📝 文件版本說明
 
 - **創建日期**：2026-05-05
-- **最後更新**：2026-05-10
-- **版本**：v1.2
+- **最後更新**：2026-05-11
+- **版本**：v1.3
 - **維護者**：Pathly 開發團隊
 
 **注意**：本索引文件會隨著專案進展持續更新。如發現索引與實際文件不符，請以各專項 changelog 為準。
