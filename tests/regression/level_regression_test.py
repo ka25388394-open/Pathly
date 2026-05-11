@@ -45,10 +45,10 @@ def run_regression_test():
 
                 # 判斷結果
                 if actual_level == expected_level:
-                    result = "✅ PASS"
+                    result = "[PASS]"
                     status = "pass"
                 else:
-                    result = "❌ FAIL"
+                    result = "[FAIL]"
                     status = "fail"
 
                 print(f"結果: {result}")
@@ -63,7 +63,7 @@ def run_regression_test():
                 })
 
             else:
-                print(f"❌ API ERROR: {response.status_code}")
+                print(f"[FAIL] API ERROR: {response.status_code}")
                 print(f"Response: {response.text}")
                 results.append({
                     "case": i,
@@ -74,7 +74,7 @@ def run_regression_test():
                 })
 
         except Exception as e:
-            print(f"❌ REQUEST ERROR: {e}")
+            print(f"[FAIL] REQUEST ERROR: {e}")
             results.append({
                 "case": i,
                 "message": message,

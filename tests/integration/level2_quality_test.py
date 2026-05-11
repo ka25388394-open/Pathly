@@ -65,7 +65,7 @@ def test_level2_quality():
 
                 print(f"\n評估結果:")
                 for aspect, result in evaluation.items():
-                    status = "✓" if result["pass"] else "✗"
+                    status = "[PASS]" if result["pass"] else "[FAIL]"
                     print(f"{status} {aspect}: {result['comment']}")
 
             else:
