@@ -1011,6 +1011,184 @@
 
 ---
 
+## 2026-05-13｜Push 前檢查、Risk/Stay marker 修復與遠端同步
+
+### 1. 開始狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：35 commits
+- modified：frontend（獨立倉庫，今日不處理）
+- untracked：0
+- 今日主線：Push 前檢查線
+- 今日是否允許 push：是（需通過檢查）
+- 今日是否允許碰 frontend：否
+- 今日是否允許碰 app/ 核心邏輯：是（僅限 TST marker 修復）
+
+### 2. 今日目標
+
+1. 確認本地 35 commits 是否可安全 push
+2. 驗證後端與核心 API
+3. 驗證 TST marker
+4. 修復 Risk / Stay blocker
+5. 推送 main-clean 到遠端
+
+### 3. 今日限制 / 憲法提醒
+
+- 不 git add .
+- 不碰 frontend
+- 不進 Phase 2E
+- 不新增 Organize / Transform 功能
+- 不重構
+- 每次只做最小更動
+- Push 前必須完整檢查
+
+### 4. 今日執行紀錄
+
+#### Step 1：Push 前狀態檢查
+
+- 目的：確認工作區狀態與分支狀態
+- 處理檔案：無（檢查狀態）
+- 操作類型：status check
+- 結果：ahead 35, untracked 0, modified 只剩 frontend
+- commit hash：無
+- 是否越界：否
+
+#### Step 2：後端服務與核心 API 驗證
+
+- 目的：確認 8007 後端與 /api/v1/ai/support 正常
+- 處理檔案：無（API 測試）
+- 操作類型：verification
+- 結果：/health 正常，/api/v1/ai/support 正常
+- commit hash：無
+- 是否越界：否
+
+#### Step 3：Risk marker 修復
+
+- 目的：修復 Risk marker 識別「我真的撐不下去了」等語句
+- 處理檔案：app/services/ai/tst_router.py
+- 操作類型：fix + commit
+- 結果：新增 Risk marker variants（撐不下去、真的撐不下去、想死）
+- commit hash：2b73f05 fix(tst): add Risk marker variants for modifier phrases
+- 是否越界：否
+
+#### Step 4：Stay marker 修復
+
+- 目的：修復 Stay marker 識別 pause intent 語句
+- 處理檔案：app/services/ai/tst_router.py
+- 操作類型：fix + commit
+- 結果：新增 Stay marker phrases（先停在這裡、不想急著整理）
+- commit hash：c9ca176 fix(tst): add Stay marker phrases for pause intent
+- 是否越界：否
+
+#### Step 5：TST marker 全量回歸
+
+- 目的：驗證所有 TST marker 功能正常
+- 處理檔案：臨時 JSON 測試檔
+- 操作類型：regression test
+- 結果：Risk 3/3, Reset 2/2, Rest 2/2, Stay 3/3, null 2/2 全部通過
+- commit hash：無（測試不產生 commit）
+- 是否越界：否
+
+#### Step 6：臨時檔清理
+
+- 目的：清理測試產生的 untracked 檔案
+- 處理檔案：test_tst_marker_regression.py, tmp_tst_marker_regression.json
+- 操作類型：delete
+- 結果：untracked 清理至 0
+- commit hash：無
+- 是否越界：否
+
+#### Step 7：Push 前最終檢查
+
+- 目的：確認所有狀態符合 push 條件
+- 處理檔案：無（狀態檢查）
+- 操作類型：final verification
+- 結果：工作區乾淨，分支健康，所有功能正常
+- commit hash：無
+- 是否越界：否
+
+#### Step 8：git push origin main-clean
+
+- 目的：將本地 35 commits 同步到遠端
+- 處理檔案：無（push 操作）
+- 操作類型：push
+- 結果：成功，99026c6..c9ca176 main-clean -> main-clean
+- commit hash：無（push 不產生新 commit）
+- 是否越界：否
+
+### 5. 今日完成事項
+
+1. **Risk push blocker 已解除**
+   - 修復 Risk marker 無法識別「我真的撐不下去了」問題
+   - 新增 Risk marker variants：撐不下去、真的撐不下去、想死
+   - commit: 2b73f05 fix(tst): add Risk marker variants for modifier phrases
+
+2. **Stay marker blocker 已解除**
+   - 修復 Stay marker pause intent 識別
+   - 新增 Stay marker phrases：先停在這裡、不想急著整理
+   - commit: c9ca176 fix(tst): add Stay marker phrases for pause intent
+
+3. **TST marker 全量回歸 12/12 通過**
+   - Risk 類型 3/3 通過
+   - Reset 類型 2/2 通過（reset_signal 正確）
+   - Rest 類型 2/2 通過
+   - Stay 類型 3/3 通過
+   - null 類型 2/2 通過（無誤判）
+
+4. **main-clean 與 origin/main-clean 同步**
+   - ahead 從 35 變成 0
+   - behind 保持 0
+   - push 成功：99026c6..c9ca176
+
+5. **untracked 維持 0**
+   - 臨時測試檔案已清理
+   - 工作區狀態乾淨
+
+### 6. 今日未完成事項
+
+1. **frontend 仍為 modified**，屬於獨立倉庫，今日不處理
+2. **Phase 2E 尚未開始**（Organize / Transform marker）
+3. **Organize / Transform 尚未開發**
+
+### 7. 風險 / 注意事項
+
+- **「最近真的很想死」類語句應持續列為 Risk / safety 高優先檢查**
+- **Phase 2E 不可直接進入，需另開新任務**
+- **frontend 仍需獨立處理**
+
+### 8. 結束狀態
+
+- branch：main-clean
+- upstream：origin/main-clean
+- ahead：0
+- behind：0
+- modified：frontend（獨立倉庫）
+- untracked：0
+- 最新 commit：c9ca176 fix(tst): add Stay marker phrases for pause intent
+- 是否可進下一階段：可以規劃，但不得直接進 Phase 2E
+- 是否建議 push：已完成 push
+
+### 9. 明天第一步
+
+建議先做 Phase 2E 前置規劃，不直接寫程式。
+優先盤點：
+- Organize marker 定義
+- Transform marker 定義
+- 是否需要新增 TST_MARKER_DECISION_RULES 更新
+- 是否需要先寫測試案例
+
+### 10. 明天禁止事項
+
+- 不直接進 Phase 2E 實作
+- 不碰 frontend
+- 不 git add .
+- 不 push，除非有新 commit 並完成檢查
+- 不重構
+- 不擴功能
+
+---
+
 ## 📝 文件版本說明
 
 - **創建日期**：2026-05-05
