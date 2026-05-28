@@ -5,16 +5,16 @@ from typing import Optional
 
 def determine_tst_marker(reset_signal: bool, message: str) -> Optional[str]:
     """
-    Phase 2D TST marker 判斷。
-    支援 Risk / Reset / Rest / Stay marker 判斷。
-    優先順序：Risk > Reset > Rest > Stay
+    Phase 2E-1 TST marker 判斷。
+    支援 Risk / Reset / Rest / Stay / Organize marker 判斷。
+    優先順序：Risk > Reset > Rest > Stay > Organize
 
     Args:
         reset_signal: Phase 1 reset 訊號偵測結果
         message: 使用者當前輸入訊息
 
     Returns:
-        Optional[str]: TST marker ("Risk" | "Reset" | "Rest" | "Stay" | None)
+        Optional[str]: TST marker ("Risk" | "Reset" | "Rest" | "Stay" | "Organize" | None)
     """
     # Phase 2C: Risk marker 檢測 - 最高優先級
     if _detect_risk_signal(message):
@@ -49,6 +49,10 @@ def determine_tst_marker(reset_signal: bool, message: str) -> Optional[str]:
     # Phase 2D: Stay marker 檢測 - 表達困難且非技術語境
     if _detect_stay_signal(message):
         return "Stay"
+
+    # Phase 2E-1: Organize marker 檢測 - 有材料且願意整理
+    if _detect_organize_signal(message):
+        return "Organize"
 
     return None
 
@@ -136,3 +140,26 @@ def _detect_stay_signal(message: str) -> bool:
 
     # 檢查是否包含 Stay 片語
     return any(pattern in message for pattern in stay_patterns)
+
+
+def _detect_organize_signal(message: str) -> bool:
+    """
+    檢測 Organize 訊號 - 有材料且願意整理
+
+    Args:
+        message: 使用者輸入訊息
+
+    Returns:
+        bool: 是否為 Organize 狀態（有材料且願意整理）
+    """
+    # Organize 觸發片語 - Phase 2E-1 保守正向案例（第一批5個）
+    organize_phrases = [
+        "我想理一理最近的狀況",
+        "我想整理一下思緒",
+        "我想把這件事講清楚一點",
+        "我開始有點頭緒了",
+        "讓我想想怎麼說比較好"
+    ]
+
+    # 檢查是否包含 Organize 片語
+    return any(phrase in message for phrase in organize_phrases)
